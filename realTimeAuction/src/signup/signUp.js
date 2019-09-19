@@ -101,7 +101,7 @@ class SignUp extends React.Component {
                     auth.onAuthStateChanged((user) => {
                         if (user) {
 
-                            db.ref().child('user').child(user.uid).child('Pinfo').set(obj).then(() => {
+                            db.ref().child('wholeData').child('user').child(user.uid).child('Pinfo').set(obj).then(() => {
                                 auth.signOut().then(() => {
                                     message.success('successfully SignUP please go and SignIn Thank You !')
                                     this.props.handleClose()

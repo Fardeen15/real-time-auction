@@ -6,8 +6,8 @@ import InputBase from '@material-ui/core/InputBase';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { IconButton, Typography, Button, Drawer, Divider, List, ListItem, ListItemText, Slide, TextField } from '@material-ui/core';
-import { Select, Modal, message } from 'antd';
+import { IconButton, Typography, Button, Drawer, Divider, List, ListItem, ListItemText, Slide, TextField, Avatar, Popper, Fade, Paper, Fab } from '@material-ui/core';
+import { Select, Modal, message, Popover } from 'antd';
 import SignUp from '../../signup/signUp';
 import { auth, db } from '../../firebaseConfige';
 const { Option } = Select;
@@ -97,6 +97,14 @@ const Styles = theme => ({
     },
     inpt: {
         width: "70%"
+    },
+    fab: {
+        height: "6vh",
+        width: "65%",
+        textAlign: "center",
+        [theme.breakpoints.down('sm')]: {
+            width: "120%",
+        },
     }
 });
 let checked = true
@@ -108,7 +116,10 @@ class Appbar extends React.Component {
             logIn: false,
             SignUP: false,
             email: "",
-            password: ""
+            password: "",
+            user: "",
+            poper: false,
+            anchorEl: null
         }
     }
     close = () => {
@@ -129,47 +140,43 @@ class Appbar extends React.Component {
                 logIn: false
             }, () => {
                 message.success('LogIn successfull')
-                // this.showConfirm().destroy()
+                this.showConfirm()
             })
         })
     }
     showConfirm = () => {
-        var modal ;
-        if (this.state.logIn) {
+        var modal = Modal.success({
+            title: 'Log In Form',
+            content: <div>
+                <TextField
+                    className={this.props.classes.inpt}
+                    id="outlined-adornment-password"
+                    variant="outlined"
+                    defaultValue={this.state.email}
+                    type='email'
+                    label="Email"
+                    onChange={(ev) => this.Change(ev, 'email')}
 
-             modal = Modal.success({
-                title: 'Log In Form',
-                content: <div>
-                    <TextField
-                        className={this.props.classes.inpt}
-                        id="outlined-adornment-password"
-                        variant="outlined"
-                        defaultValue={this.state.email}
-                        type='email'
-                        label="Email"
-                        onChange={(ev) => this.Change(ev, 'email')}
+                /><br /><br />
+                <TextField
+                    id="outlined-adornment-email"
+                    className={this.props.classes.inpt}
+                    defaultValue={this.state.password}
+                    variant="outlined"
+                    type='password'
+                    label="Password"
+                    onChange={(ev) => this.Change(ev, 'password')}
 
-                    /><br /><br />
-                    <TextField
-                        id="outlined-adornment-email"
-                        className={this.props.classes.inpt}
-                        defaultValue={this.state.password}
-                        variant="outlined"
-                        type='password'
-                        label="Password"
-                        onChange={(ev) => this.Change(ev, 'password')}
+                /><br />
+                <br />
 
-                    /><br />
-                    <br />
-
-                    <Button className={this.props.classes.btn} onClick={this.submit} variant="contained" color="primary">LogIn</Button><br />
-                    or <Button color="primary" onClick={this.close}>Rigestred now</Button>
-                </div>,
-                okText: "Cancel",
-                // onCancel:()=>{
-                // }
-            });
-        }
+                <Button className={this.props.classes.btn} onClick={this.submit} variant="contained" color="primary">LogIn</Button><br />
+                or <Button color="primary" onClick={this.close}>Rigestred now</Button>
+            </div>,
+            okText: "Cancel",
+            // onCancel:()=>{
+            // }
+        });
         if (this.state.logIn === false) {
 
             setTimeout(() => {
@@ -181,8 +188,8 @@ class Appbar extends React.Component {
     componentWillMount() {
         auth.onAuthStateChanged((user) => {
             if (user) {
-                db.ref().child('user').child(user.uid).child('Pinfo').on('value', (snap) => {
-                    console.log(snap.val())
+                db.ref().child('wholeData').child('user').child(user.uid).child('Pinfo').on('value', (snap) => {
+                    this.setState({ user: snap.val() })
                 })
             }
         })
@@ -197,37 +204,50 @@ class Appbar extends React.Component {
 
                         <AppBar className={classes.Appbar}>
                             <Toolbar>
-                                <Typography className={classes.title} variant="h6" noWrap>
-                                    Material-UI
-                            </Typography>
+                                {this.state.user ?
+                                    <Typography className={classes.title} variant="h6" noWrap>
+                                        {this.state.user.name} {this.state.user.lname}
+                                    </Typography> :
+                                    <Typography className={classes.title} variant="h6" noWrap>
+                                        No user Log iN
+                                    </Typography>
+                                }
                                 <div className={classes.grow} />
-                                {/* <div className={classes.searchParent}>
-
-                                <div className={classes.search}>
-                                    <div className={classes.searchIcon}>
-                                        <SearchIcon />
-                                    </div>
-                                    <InputBase
-                                        placeholder="Search…"
-                                        classes={{
-                                            root: classes.inputRoot,
-                                            input: classes.inputInput,
-                                        }}
-                                        inputProps={{ 'aria-label': 'search' }}
-                                    />
-                                </div>
-                            </div> */}
                                 <div className={classes.grow} />
                                 <div className={classes.sectionDesktop}>
-                                    <Button className={classes.NavBtn} onClick={() => {
-                                        this.setState({
-                                            logIn: !this.state.logIn
-                                        }, () => {
+                                    {this.state.user ?
+                                        <Popover
+                                            content={<h5>view Profile</h5>}
+                                            trigger="click"
+                                        >
+                                            <Fab size="medium" classname={classes.fab} onClick={() => {
+                                                this.setState({
+                                                    poper: !this.state.poper
+                                                })
+                                            }}>{this.state.user.name[0]}
+                                            </Fab>
+                                        </Popover>
+                                        :
+                                        <Button className={classes.NavBtn} onClick={(ev) => {
+                                            this.setState({
+                                                logIn: !this.state.logIn,
+                                                anchorEl: ev.currentTarget
+                                            }, () => {
 
-                                            this.showConfirm()
-                                        })
+                                                this.showConfirm()
+                                            })
 
-                                    }}>LogIn</Button>
+                                        }}>LogIn</Button>
+                                    }
+                                    <Popper id='simple-popper' anchorEl={this.state.anchorEl} open={this.state.poper} transition>
+
+                                        <Fade timeout={350}>
+                                            <Paper>
+                                                <Typography >The content of the Popper.</Typography>
+                                            </Paper>
+                                        </Fade>
+
+                                    </Popper>
                                 </div>
                             </Toolbar>
 
@@ -236,6 +256,7 @@ class Appbar extends React.Component {
                     </div>
 
                 </Slide>
+
                 {this.state.SignUP ?
                     <SignUp handleClose={this.close} SignUP={this.state.SignUP} />
                     : null}

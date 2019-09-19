@@ -1,18 +1,21 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import Appbar from '../Appbar/Appbar';
+import AuctionerForm from '../auctionerForm/Form';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import { Divider, Button, Grow, Slide, Zoom, Collapse } from '@material-ui/core';
+import { Button, Grow, Zoom, Slide, Collapse } from '@material-ui/core';
 import img from './images/baner.png'
 import img2 from './images/baner2.png'
 import slider1 from './images/Slider1.png'
 import slider2 from './images/Slider2.png'
 import slider3 from './images/slider3.png'
 import slider4 from './images/slider4.png'
-import { Carousel, Modal } from 'antd';
+import { Carousel, Modal, BackTop } from 'antd';
 import { auth } from '../../firebaseConfige';
-import { ok } from 'assert';
+import { GetData } from '../../action/action';
 const useStyles = (theme => ({
     content: {
         flexGrow: 1,
@@ -117,7 +120,7 @@ class Home extends React.Component {
     constructor() {
         super()
         this.state = {
-            user: false
+            user: false,
         }
     }
     error = () => {
@@ -126,13 +129,13 @@ class Home extends React.Component {
             title: 'This is an error message',
             content: 'Please LogIn Or SignUp To use This App',
             onOk() {
-                user= false
+                user = false
             },
         })
-        if(!user)
-        this.setState({
-            user : user
-        })
+        if (!user)
+            this.setState({
+                user: user
+            })
 
     }
     checkauth = () => {
@@ -141,8 +144,26 @@ class Home extends React.Component {
                 this.setState({
                     user: true
                 })
+            } else {
+                this.props.history.push('/AuctionForm')
             }
         })
+    }
+    checkauth2 = () => {
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                this.setState({
+                    user: true
+                })
+            } else {
+                this.props.history.push('/AuctionForm')
+            }
+        })
+    }
+
+    componentWillMount() {
+        console.log(this.props)
+        this.props.GetData()
     }
     render() {
         const { classes } = this.props
@@ -203,7 +224,7 @@ class Home extends React.Component {
                          </div>
                             </div>
                             <Typography style={{ textAlign: "center" }} variant="div" component="h3">
-                                <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Auctioner</Button> <Button variant="outlined" color="inherit" className={classes.choseBtn}>Fundraisers</Button>
+                                <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Auctioner</Button> <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Fundraisers</Button>
                             </Typography>
                         </Paper>
                     </Zoom>
@@ -237,12 +258,26 @@ class Home extends React.Component {
                             </div>
                         </div>
                     </Paper>
+                   
+                        <BackTop style={{background : 'black' , borderRadius: "50px",}}/>
+                    
+                    {this.state.user ?
+                        this.error() : null}
                 </main>
-                {this.state.user ?
-                    this.error() : null}
             </div>
         )
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        user: state.user,
+        userPost: state.UsersPost
+    }
+}
+const mapDispatchToProps = { GetData }
 
-export default withStyles(useStyles)(Home);
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(withStyles(useStyles)(withRouter(Home)));
