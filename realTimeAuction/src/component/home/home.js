@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom'
+import { withRouter ,Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Appbar from '../Appbar/Appbar';
 import AuctionerForm from '../auctionerForm/Form';
@@ -15,7 +15,6 @@ import slider3 from './images/slider3.png'
 import slider4 from './images/slider4.png'
 import { Carousel, Modal, BackTop } from 'antd';
 import { auth } from '../../firebaseConfige';
-import { GetData } from '../../action/action';
 const useStyles = (theme => ({
     content: {
         flexGrow: 1,
@@ -156,16 +155,13 @@ class Home extends React.Component {
                     user: true
                 })
             } else {
-                this.props.history.push('/AuctionForm')
+                this.props.history.push('/BiderHomePage')
             }
         })
     }
 
-    componentWillMount() {
-        console.log(this.props)
-        this.props.GetData()
-    }
     render() {
+        console.log(this.props)
         const { classes } = this.props
         return (
             <div style={{ width: "100%" }}>
@@ -224,7 +220,7 @@ class Home extends React.Component {
                          </div>
                             </div>
                             <Typography style={{ textAlign: "center" }} variant="div" component="h3">
-                                <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Auctioner</Button> <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Fundraisers</Button>
+                                <Button variant="outlined" color="inherit" onClick={this.checkauth} className={classes.choseBtn}>Auctioner</Button> <Button variant="outlined" color="inherit" onClick={this.checkauth2} className={classes.choseBtn}>Fundraisers</Button>
                             </Typography>
                         </Paper>
                     </Zoom>
@@ -270,14 +266,13 @@ class Home extends React.Component {
 }
 const mapStateToProps = (state) => {
     return {
-        user: state.user,
-        userPost: state.UsersPost
+        user: state,
     }
 }
-const mapDispatchToProps = { GetData }
+// const mapDispatchToProps = { GetData }
 
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    // mapDispatchToProps
 )(withStyles(useStyles)(withRouter(Home)));

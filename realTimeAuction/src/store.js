@@ -5,13 +5,13 @@ function user(state = {}, action) {
 
     switch (action.type) {
         case 'get':
-            
+            console.log(action.payload)
             return state = action.payload
-        case 'Add':
-            if (Object.values(state.usersPosts)) {
-                Object.values(state.usersPosts).push(action.payload)
-                return { UsersPost: state.UsersPost }
-            }
+        // case 'Add':
+        //     if (Object.values(state.usersPosts)) {
+        //         Object.values(state.usersPosts).push(action.payload)
+        //         return { UsersPost: state.UsersPost }
+        //     }
         // case 'Delete':
         //     state.user.splice(action.payload, 1)
         //     return { user: state.user }

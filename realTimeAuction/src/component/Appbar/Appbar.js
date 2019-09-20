@@ -1,4 +1,5 @@
-import React, { Children } from 'react'
+import React from 'react'
+import { Link } from 'react-router-dom'
 import { fade, withStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -140,7 +141,6 @@ class Appbar extends React.Component {
                 logIn: false
             }, () => {
                 message.success('LogIn successfull')
-                this.showConfirm()
             })
         })
     }
@@ -177,13 +177,6 @@ class Appbar extends React.Component {
             // onCancel:()=>{
             // }
         });
-        if (this.state.logIn === false) {
-
-            setTimeout(() => {
-                //   clearInterval(timer);
-                modal.destroy();
-            }, 1000)
-        }
     }
     componentWillMount() {
         auth.onAuthStateChanged((user) => {
@@ -217,10 +210,23 @@ class Appbar extends React.Component {
                                 <div className={classes.sectionDesktop}>
                                     {this.state.user ?
                                         <Popover
-                                            content={<h5>view Profile</h5>}
+                                            content={<div>
+                                                <p>
+                                                    <Fab size="small">{this.state.user.name[0]}</Fab>
+                                                    <Link to = "/Profile"> <Button>view Profile</Button> </Link>
+                                                </p>
+                                                <p><Button onClick={() => {
+                                                    auth.signOut().then(() => {
+                                                        this.setState({
+                                                            user: false
+
+                                                        })
+                                                    })
+                                                }}>Sign Out</Button></p>
+                                            </div>}
                                             trigger="click"
                                         >
-                                            <Fab size="medium" classname={classes.fab} onClick={() => {
+                                            <Fab size="medium" onClick={() => {
                                                 this.setState({
                                                     poper: !this.state.poper
                                                 })
@@ -239,7 +245,7 @@ class Appbar extends React.Component {
 
                                         }}>LogIn</Button>
                                     }
-                                    <Popper id='simple-popper' anchorEl={this.state.anchorEl} open={this.state.poper} transition>
+                                    {/* <Popper id='simple-popper' anchorEl={this.state.anchorEl} open={this.state.poper} transition>
 
                                         <Fade timeout={350}>
                                             <Paper>
@@ -247,7 +253,7 @@ class Appbar extends React.Component {
                                             </Paper>
                                         </Fade>
 
-                                    </Popper>
+                                    </Popper> */}
                                 </div>
                             </Toolbar>
 

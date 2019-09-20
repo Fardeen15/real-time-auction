@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter ,Link } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles';
 import Appbar from '../Appbar/Appbar';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -131,29 +131,42 @@ class AuctionerForm extends React.Component {
         })
     }
     upload = () => {
-        var obj = {
-            itemName: this.state.itemName,
-            Desciption: this.state.Desciption,
-            categeroy: this.state.categeroy,
-            price: this.state.price,
-            bidEndDate: this.state.bidEndDate,
-        }
-        if (obj.itemName && obj.Desciption && obj.categeroy && obj.price && obj.bidEndDate) {
-            this.props.add(obj)
-            message.success('Your Post Request Send')
-            this.setState({
-                itemName: "",
-                Desciption: "",
-                categeroy: "",
-                price: "",
-                bidEndDate: "",
-            }, () => {
-                this.props.history.push('/')
-            })
-        } else {
-            message.error('Please filled All Field Correctly')
-            // console.log(this.props)
-        }
+        auth.onAuthStateChanged((user) => {
+            if (user && this.props.user) {
+                var uid = user.uid
+                var pp = this.props.user.user
+                var pinfo = uid.Pinfo
+                var data = `${pp}.${pinfo}.name`
+                console.log()
+                var obj = {
+                    name : this.props.user[uid].Pinfo.name,
+                    lname : this.props.user[uid].Pinfo.lname,
+                    uid: user.uid,
+                    itemName: this.state.itemName,
+                    Desciption: this.state.Desciption,
+                    categeroy: this.state.categeroy,
+                    price: this.state.price,
+                    bidEndDate: this.state.bidEndDate,
+                    imageFile : this.state.fileList
+                }
+                if (obj.itemName && obj.Desciption && obj.categeroy && obj.price && obj.bidEndDate && obj.imageFile) {
+                    this.props.add(obj)
+                    message.success('Your Post Request Send')
+                    this.setState({
+                        itemName: "",
+                        Desciption: "",
+                        categeroy: "",
+                        price: "",
+                        bidEndDate: "",
+                    }, () => {
+                        this.props.history.push('/')
+                    })
+                } else {
+                    message.error('Please filled All Field Correctly')
+                    // console.log(this.props)
+                }
+            }
+        })
     }
     getStepContent = (step) => {
         switch (step) {
@@ -192,14 +205,14 @@ class AuctionerForm extends React.Component {
                 <div className="ant-upload-text">Upload</div>
             </div>
         );
-
+        const category = ['TV','Mobile','Air Conditioner', 'Refrigirator' , 'Camera', 'Bike'];
         let steps = [1, 2, 3]
         const { classes } = this.props
         return (
             <div>
                 <Appbar />
                 <main className={classes.content}>
-                 <Link to = "/"> <Fab color="primary" aria-label="add" className={classes.fab}>
+                    <Link to="/"> <Fab color="primary" aria-label="add" className={classes.fab}>
                         <ArrowBackIcon />
                     </Fab></Link>
                     <Paper className={classes.paper}>
@@ -241,9 +254,12 @@ class AuctionerForm extends React.Component {
                                             style={{ width: "100%" }}
                                             onChange={(ev) => this.Change(ev, 'categeroy')}
                                         >
-                                            <Option value="jack">Jack</Option>
-                                            <Option value="lucy">Lucy</Option>
-                                            <Option value="tom">Tom</Option>
+                                            {
+                                                category.map((value)=>{
+                                                    return <Option key = {value} value={value}>{value}</Option>
+                                                })
+                                            }
+                                            
                                         </Select>
                                         <Input
                                             value={this.state.Desciption}
@@ -273,7 +289,6 @@ class AuctionerForm extends React.Component {
                                             <h3>{this.getStepContent(this.state.activeStep)}</h3>
 
                                             <Upload
-                                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                                                 listType="picture-card"
                                                 fileList={this.state.fileList}
                                                 onPreview={this.handlePreview}
