@@ -131,6 +131,7 @@ class AuctionerForm extends React.Component {
         })
     }
     upload = () => {
+        console.log(this.state.fileList)
         auth.onAuthStateChanged((user) => {
             if (user && this.props.user) {
                 var uid = user.uid

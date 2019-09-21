@@ -1,9 +1,10 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import Appbar from '../Appbar/Appbar';
-import { Paper, Card, CardHeader, Avatar, IconButton, CardMedia,List,ListItem,ListItemText, CardContent, Typography, Drawer } from '@material-ui/core'
-import { withRouter ,Link } from 'react-router-dom'
+import { Paper, Card, CardHeader, Avatar, IconButton, CardMedia, List, ListItem, ListItemText, CardContent, Typography, Drawer } from '@material-ui/core'
+import { withRouter, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { storage } from '../../firebaseConfige';
 const drawerWidth = 240
 const drawer = { open: false }
 const useStyles = (theme => ({
@@ -46,16 +47,23 @@ const useStyles = (theme => ({
     },
 }))
 class BidderHomePAge extends React.Component {
-    constructor(){
+    constructor() {
         super()
         this.state = {
-            category : ""
+            category: ""
         }
     }
+    postingImg = (img)=>{
+        console.log(img)
+        storage.refFromURL(img).getDownloadURL().then((res)=>{
+            console.log(res)
+        })
+    }
     render() {
-        const category = ['TV','Mobile','Air Conditioner', 'Refrigirator' , 'Camera', 'Bike'];
+        
+        const category = ['TV', 'Mobile', 'AirConditioner', 'Refrigirator', 'Camera', 'Bike'];
         // this.props.match.params.id = this.state.category
-        // console.log(this.props.match.params.id,this.props.match)
+        console.log(this.props.user)
         const { classes } = this.props
         return (
             <div>
@@ -85,7 +93,7 @@ class BidderHomePAge extends React.Component {
                     <Divider /> */}
                     <List>
                         {category.map((text, index) => (
-                            <Link to = {`/BiderHomePage/${text}`}> <ListItem button key={text}>
+                            <Link to={`/BiderHomePage/${text}`}> <ListItem button key={text}>
                                 <ListItemText primary={text} />
                             </ListItem></Link>
                         ))}
@@ -94,8 +102,8 @@ class BidderHomePAge extends React.Component {
                 <Appbar />
                 <main className={classes.content}>
                     <Paper className={classes.root}>
-                        {this.props.user.usersPosts && this.props.match.params.id ?
-                            Object.values(this.props.user.usersPosts[this.props.match.params.id]).map((value) => {
+                        {this.props.user.usersPosts && this.props.match.params.id && this.props.user.usersPosts[this.props.match.params.id] ?
+                            Object.values(this.props.user.usersPosts[this.props.match.params.id]).map((value,index) => {
                                 console.log(value)
                                 return (
 
@@ -129,9 +137,22 @@ class BidderHomePAge extends React.Component {
                                                 Detail : {value.Desciption}
                                             </Typography>
 
+                                        {this.props.user.postImg ?
+                                            this.props.user.postImg.items.map((img) => {
+                                                value.imageFile.map((imgname)=>{
+                                                    console.log(img.name ,imgname.name)
+                                                    if(img.name === imgname.name){
+                                                        console.log(img.toString())
+                                                        this.postingImg(img.toString())
+                                                    }
+                                                    return <h1>hello</h1>
+                                                })
+                                            })
+                                            : null}
                                         </CardContent>
                                         <CardMedia
                                             className={classes.media}
+
                                             image="https://pi.tedcdn.com/r/talkstar-photos.s3.amazonaws.com/uploads/72bda89f-9bbf-4685-910a-2f151c4f3a8a/NicolaSturgeon_2019T-embed.jpg?w=512"
                                             title="Ted talk"
                                         />

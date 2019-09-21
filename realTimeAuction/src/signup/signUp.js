@@ -5,7 +5,7 @@ import { Upload, Icon, message } from 'antd';
 import CloseIcon from '@material-ui/icons/Close';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import zIndex from '@material-ui/core/styles/zIndex';
-import { auth, db } from '../firebaseConfige';
+import { auth, db, storage } from '../firebaseConfige';
 const Styles = theme => ({
     content: {
         flexGrow: 1,
@@ -53,6 +53,7 @@ class SignUp extends React.Component {
     constructor() {
         super()
         this.state = {
+            url : "",
             loading: false,
             imageUrl: "",
             name: "",
@@ -73,6 +74,7 @@ class SignUp extends React.Component {
             getBase64(info.file.originFileObj, imageUrl =>
                 this.setState({
                     imageUrl,
+                    url : info.file.originFileObj,
                     loading: false,
 
                 }),
@@ -86,6 +88,7 @@ class SignUp extends React.Component {
         })
     }
     submit = () => {
+        
         var obj = {
             name: this.state.name,
             lname: this.state.lname,
@@ -102,6 +105,7 @@ class SignUp extends React.Component {
                         if (user) {
 
                             db.ref().child('wholeData').child('user').child(user.uid).child('Pinfo').set(obj).then(() => {
+                                storage.ref(`profileImages/${user.uid}`).put(this.state.url)
                                 auth.signOut().then(() => {
                                     message.success('successfully SignUP please go and SignIn Thank You !')
                                     this.props.handleClose()
@@ -118,6 +122,7 @@ class SignUp extends React.Component {
             }
         } else {
             message.warning('please Check input filled')
+            console.log(this.state.url)
         }
     }
     render() {

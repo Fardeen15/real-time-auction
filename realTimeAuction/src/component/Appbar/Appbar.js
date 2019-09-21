@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import { fade, withStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -10,7 +11,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { IconButton, Typography, Button, Drawer, Divider, List, ListItem, ListItemText, Slide, TextField, Avatar, Popper, Fade, Paper, Fab } from '@material-ui/core';
 import { Select, Modal, message, Popover } from 'antd';
 import SignUp from '../../signup/signUp';
-import { auth, db } from '../../firebaseConfige';
+import { auth, db, storage } from '../../firebaseConfige';
 const { Option } = Select;
 
 const drawerWidth = 240;
@@ -119,8 +120,10 @@ class Appbar extends React.Component {
             email: "",
             password: "",
             user: "",
+            url: "",
             poper: false,
-            anchorEl: null
+            anchorEl: null,
+            callfn : true
         }
     }
     close = () => {
@@ -178,16 +181,58 @@ class Appbar extends React.Component {
             // }
         });
     }
+    profileimage = (image) => {
+        console.log(image)
+        storage.refFromURL(image).getDownloadURL().then((url) => {
+            console.log(url)
+            this.setState({
+                url
+            })
+        })
+    }
+
     componentWillMount() {
         auth.onAuthStateChanged((user) => {
             if (user) {
                 db.ref().child('wholeData').child('user').child(user.uid).child('Pinfo').on('value', (snap) => {
                     this.setState({ user: snap.val() })
                 })
+
             }
         })
     }
+    // componentWillReceiveProps(){
+
+    //     console.log(this.props.user)
+    // }
+    // componentWillUpdate(){
+    //     console.log(this.props.user)
+
+    // }
     render() {
+        // const { url } = this.state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                
+                if (this.props.user.ProfileImages.items && this.state.callfn) {
+                    // console.log(Object.values(this.props.user.ProfileImages))
+                    this.props.user.ProfileImages.items.forEach((item) => {
+                        console.log(item.toString())
+
+                        if (item.name === user.uid) {
+                            this.profileimage(item.toString())
+                            this.setState({
+                                callfn : false,
+                                // url : this.props.user.ProfileImages
+                            })
+                        }
+                    })
+                }else{
+                    console.log(this.props.user.ProfileImages)
+
+                }
+            }
+        })
         const { classes } = this.props;
         return (
             <div>
@@ -212,8 +257,7 @@ class Appbar extends React.Component {
                                         <Popover
                                             content={<div>
                                                 <p>
-                                                    <Fab size="small">{this.state.user.name[0]}</Fab>
-                                                    <Link to = "/Profile"> <Button>view Profile</Button> </Link>
+                                                    <Fab size="small">{this.state.user.name[0]}</Fab> <Link to="/Profile"> <Button>view Profile</Button> </Link>
                                                 </p>
                                                 <p><Button onClick={() => {
                                                     auth.signOut().then(() => {
@@ -226,12 +270,12 @@ class Appbar extends React.Component {
                                             </div>}
                                             trigger="click"
                                         >
-                                            <Fab size="medium" onClick={() => {
+                                            <Avatar src = {this.state.url} size="medium" onClick={() => {
                                                 this.setState({
                                                     poper: !this.state.poper
                                                 })
-                                            }}>{this.state.user.name[0]}
-                                            </Fab>
+                                            }}/>
+                                            {/* </Avatar > */}
                                         </Popover>
                                         :
                                         <Button className={classes.NavBtn} onClick={(ev) => {
@@ -271,4 +315,14 @@ class Appbar extends React.Component {
         )
     }
 }
-export default withStyles(Styles)(Appbar);
+const mapStateToProps = (state) => {
+    console.log(state.ProfileImages)
+    return {
+        user: state
+    }
+    
+}
+
+export default connect(
+    mapStateToProps,
+)(withStyles(Styles)(Appbar));
