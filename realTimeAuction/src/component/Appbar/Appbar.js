@@ -278,6 +278,7 @@ class Appbar extends React.Component {
                                             {/* </Avatar > */}
                                         </Popover>
                                         :
+                                        
                                         <Button className={classes.NavBtn} onClick={(ev) => {
                                             this.setState({
                                                 logIn: !this.state.logIn,

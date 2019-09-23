@@ -22,3 +22,10 @@ i#icon{
 .ant-message{
   z-index: 1800 !important
 }
+.CommentBox{
+  max-height: 45vh;
+  overflow-y: scroll;
+ }
+ .CommentBox::-webkit-scrollbar { 
+   width: 0
+ }
