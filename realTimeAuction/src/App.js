@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import './App.css';
+
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Home from './component/home/home';
 import AuctionerForm from './component/auctionerForm/Form';

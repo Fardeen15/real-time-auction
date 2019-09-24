@@ -1,7 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import Appbar from '../Appbar/Appbar';
-import { Paper, Card, CardHeader, Avatar, IconButton, CardMedia, List, ListItem, ListItemText, CardContent, Typography, Drawer, TextField, Fab } from '@material-ui/core'
+import { Paper, Card, CardHeader, Avatar, IconButton, CardMedia, List, Tooltip, ListItem, ListItemText, CardContent, Typography, Drawer, TextField, Fab } from '@material-ui/core'
 import { withRouter, Link } from 'react-router-dom'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -11,7 +11,8 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { connect } from 'react-redux'
 import { storage, auth } from '../../firebaseConfige';
 import { update } from '../../action/action';
-import { Button } from 'antd';
+import { Button, Select } from 'antd';
+const Option = Select.Option
 const drawerWidth = 240
 const drawer = { open: false }
 const useStyles = (theme => ({
@@ -48,6 +49,14 @@ const useStyles = (theme => ({
             marginLeft: "30%",
         },
     },
+    root1: {
+        // width: "60%",
+        // marginRight: "auto",
+        // marginLeft: "30%",
+        [theme.breakpoints.up('sm')]: {
+            display: 'none'
+        },
+    },
     card: {
         marginRight: "auto",
         marginLeft: 'auto',
@@ -70,6 +79,7 @@ class BidderHomePAge extends React.Component {
             keys: "",
             comment: "",
             callfn: "",
+            category : "select Category",
             imgUrls: []
         }
     }
@@ -118,8 +128,8 @@ class BidderHomePAge extends React.Component {
     componentWillReceiveProps(nextProps) {
         console.log(this.props.user)
         if (nextProps.user.usersPosts) {
-            console.log("ashd")
-            if (this.props.user && nextProps.user.usersPosts) {
+            // console.log("ashd")
+            if (this.props.user && nextProps.user.usersPosts && nextProps.user.usersPosts[this.props.match.params.id]) {
                 this.setState({
                     keys: Object.keys(nextProps.user.usersPosts[this.props.match.params.id])
                 }, () => {
@@ -131,79 +141,113 @@ class BidderHomePAge extends React.Component {
 
             }
         }
-        // if (nextProps.user.ProfileImages.items) {
-
-        //     let arr = []
-        //     nextProps.user.ProfileImages.items.forEach((item, index) => {
-        //         arr.push(item)
-        //     })
-        //     this.setState({
-        //         imgUrls: arr
-        //     }, () => {
-        //         console.log(this.state.imgUrls)
-        //     })
-        // }
-        // console.log(nextProps)
     }
-    profileimage = (img, uid) => {
-        // console.log(img)
+    // profileimage = (img, uid) => {
+    //     // console.log(img)
 
-        if (img) {
-            let url;
-            storage.refFromURL(img).getDownloadURL().then((res) => {
-                // this.setState({
-                //     [uid]: res
-                // },()=>{
-                url = res
-                return url
-            })
-            setTimeout(() => {
-                if (url) {
-                    // this.setState({
-                    //     [uid] : url
-                    // })
-                    return url
 
-                }
-            }, 5000)
-        }
+    //     if (img) {
+    //      let url = storage.refFromURL(img).getDownloadURL().then((res) => {
+    //             // url = res
+    //             // console.log(url)
+    //             return res
+    //         })
+    //         if(url !== undefined){
+    //             console.log(url)
+    //             return url
+    //         }
+    //     }
+    //     // setTimeout(() => {
+    //     //     if (url) {
 
-    }
-    profileimg = (uid) => {
-        let img
+    //     //         console.log(url)
+    //     //         // this.profileimg(uid)
+    //     //         return url
 
-        let name = this.props.user.ProfileImages.items.find((item) => {
+    //     //     }
+    //     // }, 3000)
 
-            return item.name === uid
-        })
-        // console.log(name)
+    // }
+    // profileimg = (uid) => {
+    //     let img
 
-        // console.log(this.state.imgUrls)
-        // this.state.imgUrls.forEach((item)=>{
-        if (name) {
-            img = this.profileimage(name.toString(), uid)
-            // if(img){
+    //     let name = this.props.user.ProfileImages.items.find((item) => {
 
-            setTimeout(() => {
-                console.log(img)
-                if (img) {
-                    console.log(img)
-                }
-                return img
-            }, 5000)
-            // }
-        }
+    //         return item.name === uid
+    //     })
+    //     if (name) {
+    //         storage.refFromURL(name.toString()).getDownloadURL().then((res) => {
+    //             img = res
+    //         })
+    //         // img = this.profileimage(name.toString(), uid)
+    //         setTimeout(() => {
+    //             console.log(img)
+    //             return img
+    //             //     console.log(this.profileimage(name.toString(), uid))
+    //             //     if (img) {
+    //             //         console.log(img)
+    //             //     }
+    //             //     return img
+    //         }, 5000)
+    //     }
+    //     // setTimeout(() => {
+    //     //     if (img) {
+    //     //         console.log(img.i)
+    //     //         return img.i
+    //     //     } else {
+    //     //         console.log(img)
+    //     //     }
+    //     // }, 5000)
 
-    }
+    // }
     // componentDidMount() {
 
 
     // }
+
+    // Profileimg = (uid) => {
+    //     let name = this.props.user.ProfileImages.items.find((item) => {
+    //         return item.name === uid
+    //     })
+    //     if (name) {
+    //         this.geturl(name.toString())
+    //     }
+    // }
+    // geturl = (name) => {
+    //     let url;
+    //     if (name) {
+    //         url = storage.refFromURL(name.toString()).getDownloadURL().then((res) => {
+    //             console.log(res)
+    //             return res
+    //         })
+    //     }
+    //     setTimeout(() => {
+    //         if (url) {
+
+    //             console.log(url.i)
+    //             return url.i
+    //         }
+    //     }, 5000)
+    // }
+    componentDidMount(){
+        if(this.props.user.usersPosts && this.props.match.params.id && this.props.user.usersPosts[this.props.match.params.id]){
+            var data = Object.values(this.props.user.usersPosts[this.props.match.params.id])
+            for (let i = 0; i < data.length; i++){
+                if(data[i].comment){
+                    console.log(Object.values(data[i].comment))
+                }
+            }
+        }
+    }
     render() {
 
         const category = ['TV', 'Mobile', 'AirConditioner', 'Refrigirator', 'Camera', 'Bike'];
         // this.props.match.params.id = this.state.category
         // console.log(this.props.user)
+        if(this.state.category !== "select Category"){
+            // console.log(this.state.category)
+            this.props.match.params.id = this.state.category
+        }
 
         const { classes } = this.props
         return (
@@ -242,10 +286,29 @@ class BidderHomePAge extends React.Component {
                 </Drawer>
                 <Appbar />
                 <main className={classes.content}>
+                    <Paper style={{ background: "none", paddingTop: "7%" }} className={classes.root1}>
+
+                        <Select
+                            showSearch
+                            value={this.state.category}
+                            style={{ width: "100%" }}
+                            onChange={(ev) => this.setState({
+                                category: ev
+                            })}
+                            placeholder="Select a person"
+                            optionFilterProp="children"
+                        >
+                            {
+                                category.map((value) => {
+                                    return <Option key={value} value={value}>{value}</Option>
+                                })
+                            }
+                        </Select>
+                    </Paper>
                     <Paper className={classes.root}>
                         {this.props.user.usersPosts && this.props.match.params.id && this.props.user.usersPosts[this.props.match.params.id] ?
                             Object.values(this.props.user.usersPosts[this.props.match.params.id]).map((value, index) => {
-                                console.log(value)
+                            
                                 return (
 
                                     <Card className={classes.card}>
@@ -258,11 +321,7 @@ class BidderHomePAge extends React.Component {
                                                     />
                                                 )
                                             }
-                                            action={
-                                                <Button onClick={() => {
-                                                    console.log(this.state.imgUrls)
-                                                }}>click me</Button>
-                                            }
+
                                             title={`${value.name} ${value.lname}`}
                                         // subheader={}
                                         />
@@ -305,26 +364,24 @@ class BidderHomePAge extends React.Component {
                                                     aria-controls="panel1a-content"
                                                     id="panel1a-header"
                                                 >
-                                                    <Typography className={classes.heading}>Bidding</Typography>
+                                                    <Typography className={classes.heading}>{value.comment?Object.values(value.comment).length : 0 } Bidding </Typography>
                                                 </ExpansionPanelSummary>
                                                 <ExpansionPanelDetails style={{ display: 'block' }}>
                                                     <div className="CommentBox">
                                                         {
                                                             value.comment ?
                                                                 Object.values(value.comment).map((cmt, i) => {
-
+                                                                    // this.Profileimg(cmt.userUid)
                                                                     return (
                                                                         <CardHeader
                                                                             avatar={
                                                                                 <Avatar size='small'
-                                                                                    src={this.profileimg(cmt.userUid) ? this.profileimg(cmt.userUid) : ""}
+                                                                                    // src={this.geturl() ? this.geturl() : ""}
+
                                                                                     aria-label="recipe" className={classes.Fab} />}
                                                                             title={`${cmt.name} ${cmt.lname}`}
                                                                             subheader={cmt.comment}
-                                                                        >
-                                                                            {}
-                                                                        </CardHeader>
-
+                                                                        />
                                                                     )
                                                                 })
                                                                 : null}
@@ -357,7 +414,7 @@ class BidderHomePAge extends React.Component {
                             }) : null}
                     </Paper>
                 </main>
-            </div>
+            </div >
         )
     }
 }
