@@ -206,7 +206,7 @@ class AuctionerForm extends React.Component {
                 <div className="ant-upload-text">Upload</div>
             </div>
         );
-        const category = ['TV','Mobile','Air Conditioner', 'Refrigirator' , 'Camera', 'Bike'];
+        const category = ['TV','Mobile','AirConditioner', 'Refrigirator' , 'Camera', 'Bike'];
         let steps = [1, 2, 3]
         const { classes } = this.props
         return (
